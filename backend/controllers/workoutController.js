@@ -1,17 +1,9 @@
 const Workout = require('../models/Workout');
 
-// Yeni antrenman kaydı oluşturma
 const antrenmanEkle = async (req, res) => {
     try {
         const { kullaniciId, baslik, sure, notlar } = req.body;
-
-        const yeniAntrenman = new Workout({
-            kullaniciId,
-            baslik,
-            sure,
-            notlar
-        });
-
+        const yeniAntrenman = new Workout({ kullaniciId, baslik, sure, notlar });
         await yeniAntrenman.save();
         res.status(201).json({ mesaj: 'Antrenman kaydi basariyla olusturuldu.', veri: yeniAntrenman });
     } catch (error) {
@@ -19,7 +11,6 @@ const antrenmanEkle = async (req, res) => {
     }
 };
 
-// Kullanıcıya ait tüm antrenmanları listeleme
 const antrenmanlariGetir = async (req, res) => {
     try {
         const { kullaniciId } = req.params;
@@ -30,7 +21,6 @@ const antrenmanlariGetir = async (req, res) => {
     }
 };
 
-// Antrenman kaydı silme
 const antrenmanSil = async (req, res) => {
     try {
         const { id } = req.params;
@@ -41,4 +31,22 @@ const antrenmanSil = async (req, res) => {
     }
 };
 
-module.exports = { antrenmanEkle, antrenmanlariGetir, antrenmanSil };
+// YENİ EKLENEN: Güncelleme (PUT) İşlemi
+const antrenmanGuncelle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const guncellenenVeri = req.body;
+        
+        // new: true ayarı, güncellenmiş yeni veriyi geri döndürmesini sağlar
+        const guncelAntrenman = await Workout.findByIdAndUpdate(id, guncellenenVeri, { new: true });
+        
+        if (!guncelAntrenman) {
+            return res.status(404).json({ mesaj: 'Guncellenecek antrenman bulunamadi.' });
+        }
+        res.status(200).json({ mesaj: 'Antrenman basariyla guncellendi.', veri: guncelAntrenman });
+    } catch (error) {
+        res.status(500).json({ mesaj: 'Antrenman guncellenirken sunucu hatasi olustu.', hata: error.message });
+    }
+};
+
+module.exports = { antrenmanEkle, antrenmanlariGetir, antrenmanSil, antrenmanGuncelle };

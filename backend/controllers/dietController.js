@@ -1,16 +1,9 @@
 const Diet = require('../models/Diet');
 
-// Yeni beslenme/öğün kaydı oluşturma
 const ogunEkle = async (req, res) => {
     try {
         const { kullaniciId, ogunAdi, kalori } = req.body;
-
-        const yeniOgun = new Diet({
-            kullaniciId,
-            ogunAdi,
-            kalori
-        });
-
+        const yeniOgun = new Diet({ kullaniciId, ogunAdi, kalori });
         await yeniOgun.save();
         res.status(201).json({ mesaj: 'Beslenme kaydi basariyla olusturuldu.', veri: yeniOgun });
     } catch (error) {
@@ -18,7 +11,6 @@ const ogunEkle = async (req, res) => {
     }
 };
 
-// Kullanıcıya ait tüm öğünleri listeleme
 const ogunleriGetir = async (req, res) => {
     try {
         const { kullaniciId } = req.params;
@@ -29,7 +21,6 @@ const ogunleriGetir = async (req, res) => {
     }
 };
 
-// Öğün kaydı silme
 const ogunSil = async (req, res) => {
     try {
         const { id } = req.params;
@@ -40,4 +31,21 @@ const ogunSil = async (req, res) => {
     }
 };
 
-module.exports = { ogunEkle, ogunleriGetir, ogunSil };
+// YENİ EKLENEN: Güncelleme (PUT) İşlemi
+const ogunGuncelle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const guncellenenVeri = req.body;
+        
+        const guncelOgun = await Diet.findByIdAndUpdate(id, guncellenenVeri, { new: true });
+        
+        if (!guncelOgun) {
+            return res.status(404).json({ mesaj: 'Guncellenecek ogun bulunamadi.' });
+        }
+        res.status(200).json({ mesaj: 'Beslenme kaydi basariyla guncellendi.', veri: guncelOgun });
+    } catch (error) {
+        res.status(500).json({ mesaj: 'Beslenme kaydi guncellenirken sunucu hatasi olustu.', hata: error.message });
+    }
+};
+
+module.exports = { ogunEkle, ogunleriGetir, ogunSil, ogunGuncelle };

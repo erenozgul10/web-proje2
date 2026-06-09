@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Workout from '../components/Workout';
+import Diet from '../components/Diet';
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // Güvenlik: Eğer giriş yapmadan bu linke girmeye çalışan olursa, kapıdan çevir!
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -12,25 +13,24 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-  // Çıkış Yapma İşlemi
   const cikisYap = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('kullaniciId');
-    navigate('/login'); // Çıkış yapınca tekrar giriş ekranına yolla
+    navigate('/login');
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+    <div style={{ padding: '40px 20px', maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
+      {/* Üst Menü Barı */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-        <h2>🏋️‍♂️ Spor Salonu Ana Panel</h2>
+        <h2>🏋️‍♂️ Gelişim ve Takip Paneli</h2>
         <button onClick={cikisYap} style={{ width: '120px', backgroundColor: '#dc3545', marginTop: '0' }}>Çıkış Yap</button>
       </div>
       
-      <div style={{ marginTop: '30px', backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-        <h3>Hoş Geldin!</h3>
-        <p style={{ marginTop: '10px', color: '#555' }}>
-          Günlük antrenman programlarını ve beslenme/kalori takiplerini buradan yönetebilirsin. Modüller birazdan buraya eklenecek.
-        </p>
+      {/* Alt Modüller (Yanyana dizmek için flex kullanıyoruz) */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: '20px', margin: '20px -10px' }}>
+        <Workout />
+        <Diet />
       </div>
     </div>
   );

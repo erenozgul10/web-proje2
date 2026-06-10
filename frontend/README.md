@@ -1,16 +1,25 @@
-# React + Vite
+# 🏋️‍♂️ Rumeli Fitness - Full-Stack Spor Salonu Yönetim Sistemi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Bu proje, İstanbul Rumeli Üniversitesi Bilgisayar Mühendisliği Bölümü **BLG330 - Web Programlama** dersi dönem projesi kapsamında **Eren Özgül (231201041)** tarafından geliştirilmiştir.
 
-Currently, two official plugins are available:
+## 🚀 Proje Hakkında
+Rumeli Fitness, kullanıcıların günlük kalori hedeflerini, antrenman programlarını, vücut ölçümlerini ve su tüketimlerini tek bir panel üzerinden yönetebildikleri **MERN Stack (MongoDB, Express.js, React.js, Node.js)** tabanlı bir web uygulamasıdır.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠 Kullanılan Teknolojiler
+* **Frontend:** React.js, React Router, Vite, React-Toastify
+* **Backend:** Node.js, Express.js
+* **Veritabanı:** MongoDB (Mongoose ORM)
+* **Güvenlik:** JSON Web Token (JWT), Bcrypt (Şifre Hashing)
 
-## React Compiler
+## 🌟 Öne Çıkan Özellikler
+* **Korumalı Rotalar (Protected Routes):** Sadece JWT token'a sahip giriş yapmış kullanıcılar panele erişebilir.
+* **RESTful API:** GET, POST, PUT ve DELETE işlemlerinin tamamı asenkron olarak çalışır.
+* **İlişkisel Veritabanı:** Kullanıcı ile antrenman/diyet verileri MongoDB üzerinde `populate` ile ilişkilendirilmiştir.
+* **Dinamik UX/UI:** Anlık yükleniyor animasyonları (Spinner), Toast bildirimleri ve CSS interaktif Su Takip Modülü.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ⚙️ Kurulum Adımları
+Projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımları izleyin:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Projeyi klonlayın:
+   ```bash
+   git clone [https://github.com/KULLANICI_ADIN/proje-repo-ismi.git](https://github.com/KULLANICI_ADIN/proje-repo-ismi.git)

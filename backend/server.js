@@ -24,7 +24,7 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/api/auth', authRoute);
 app.use('/api/workouts', workoutRoute);
 app.use('/api/diets', dietRoute);
-
+app.use('/api/data', require('./routes/dataRoutes'));
 // Test Endpoint'i
 app.get('/', (req, res) => {
     res.send('Spor Salonu Yonetim Sistemi Backend API Calisiyor.');

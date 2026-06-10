@@ -1,20 +1,29 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard'; // Yeni sayfamızı import ettik
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import About from './pages/About';
 
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        {/* Ana siteye girenleri direkt login'e at */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        
+        {/* Serbest giriş sayfaları */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} /> {/* Paneli sisteme tanıttık */}
+        
+        {/* Güvenliği kendi içlerinde olan panellerimiz */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/about" element={<About />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-}
+};
 
 export default App;

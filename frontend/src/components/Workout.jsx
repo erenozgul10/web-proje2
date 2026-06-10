@@ -1,69 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const egzersizVerileri = {
+  Kardiyo: [{ ad: 'Basketbol', carpan: 10 }, { ad: 'Koşu Bandı', carpan: 9 }, { ad: 'Bisiklet', carpan: 8 }, { ad: 'Merdiven', carpan: 11 }],
+  Antrenman: [{ ad: 'Sırt Günü', carpan: 7 }, { ad: 'Bacak Günü', carpan: 8 }, { ad: 'Full Body', carpan: 9 }, { ad: 'Göğüs Günü', carpan: 6 }, { ad: 'Biceps Günü', carpan: 5 }, { ad: 'Arka Kol Günü', carpan: 5 }]
+};
 
 const Workout = () => {
-  const [workouts, setWorkouts] = useState([]);
-  const [baslik, setBaslik] = useState('');
+  const [kategori, setKategori] = useState('Kardiyo');
+  const [egzersiz, setEgzersiz] = useState('Basketbol');
   const [sure, setSure] = useState('');
   const [notlar, setNotlar] = useState('');
-  
-  const kullaniciId = localStorage.getItem('kullaniciId');
-  const token = localStorage.getItem('token');
-  const config = { headers: { Authorization: `Bearer ${token}` } };
+  const [kayitlar, setKayitlar] = useState([]);
 
-  // Veritabanından listeyi çeken fonksiyon
-  const antrenmanlariGetir = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/workouts/${kullaniciId}`, config);
-      setWorkouts(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch('http://localhost:5000/api/data/antrenman', { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(res => res.json())
+      .then(data => setKayitlar(data))
+      .catch(err => console.log(err));
+  }, []);
 
-  useEffect(() => { antrenmanlariGetir(); }, []);
-
-  // Yeni antrenman ekleme
-  const ekle = async (e) => {
+  const antrenmanKaydet = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
+    const aktifEgzersiz = egzersizVerileri[kategori].find(e => e.ad === egzersiz);
+    const yakilanKalori = sure ? (sure * aktifEgzersiz.carpan) : 0;
+    
     try {
-      await axios.post('http://localhost:5000/api/workouts', { kullaniciId, baslik, sure, notlar }, config);
-      setBaslik(''); setSure(''); setNotlar('');
-      antrenmanlariGetir(); // Ekledikten sonra listeyi yenile
-    } catch (err) { alert('Antrenman eklenirken hata olustu!'); }
+      const res = await fetch('http://localhost:5000/api/data/antrenman', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ tip: egzersiz, sure, kalori: yakilanKalori, notlar })
+      });
+      const eklenenData = await res.json();
+      setKayitlar([eklenenData, ...kayitlar]);
+      setSure(''); setNotlar('');
+      toast.success('🏃‍♂️ Antrenman başarıyla eklendi!', { theme: "colored" });
+    } catch (error) { toast.error('Hata oluştu!'); }
   };
 
-  // Antrenman silme
-  const sil = async (id) => {
+  const antrenmanSil = async (id) => {
+    if (!window.confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
+    const token = localStorage.getItem('token');
     try {
-      await axios.delete(`http://localhost:5000/api/workouts/${id}`, config);
-      antrenmanlariGetir(); // Sildikten sonra listeyi yenile
-    } catch (err) { alert('Silme isleminde hata!'); }
+      await fetch(`http://localhost:5000/api/data/antrenman/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      setKayitlar(kayitlar.filter(kayit => kayit._id !== id));
+      toast.error('🗑️ Antrenman silindi!', { theme: "colored" });
+    } catch (error) { console.error(error); }
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', flex: 1, margin: '10px', minWidth: '300px' }}>
-      <h3>🏃‍♂️ Kardiyo ve Antrenmanlarım</h3>
-      <form onSubmit={ekle} style={{ marginTop: '15px' }}>
-        <input placeholder="Örn: 45 Dk Koşu Bandı" required value={baslik} onChange={(e) => setBaslik(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-        <input placeholder="Süre (Dakika)" type="number" required value={sure} onChange={(e) => setSure(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-        <input placeholder="Notlar (Örn: Eğim seviyesi 5)" value={notlar} onChange={(e) => setNotlar(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-        <button type="submit" style={{ backgroundColor: '#007bff' }}>Antrenmanı Kaydet</button>
+    <div style={{ flex: '1', minWidth: '320px', backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+      <h3 style={{ color: '#212529', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '15px' }}>🏃‍♂️ Kardiyo ve Antrenmanlarım</h3>
+      <form onSubmit={antrenmanKaydet}>
+        <select value={kategori} onChange={(e) => { setKategori(e.target.value); setEgzersiz(egzersizVerileri[e.target.value][0].ad); }} style={{ width: '100%', padding: '10px', borderRadius: '5px', marginBottom: '10px' }}>
+          <option value="Kardiyo">🏃 Kardiyo</option><option value="Antrenman">🏋️ Ağırlık Antrenmanı</option>
+        </select>
+        <select value={egzersiz} onChange={(e) => setEgzersiz(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', marginBottom: '10px' }}>
+          {egzersizVerileri[kategori].map((item, index) => <option key={index} value={item.ad}>{item.ad}</option>)}
+        </select>
+        <input type="number" placeholder="Süre (Dakika)" value={sure} onChange={(e) => setSure(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '5px', marginBottom: '10px' }} />
+        <input type="text" placeholder="Notlar" value={notlar} onChange={(e) => setNotlar(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '5px', marginBottom: '15px' }} />
+        <button type="submit" style={{ width: '100%', padding: '12px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>Antrenmanı Kaydet</button>
       </form>
-      
-      <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
-        {workouts.map(w => (
-          <li key={w._id} style={{ borderBottom: '1px solid #eee', padding: '15px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <strong style={{ color: '#333' }}>{w.baslik}</strong> <span style={{ color: '#666' }}>({w.sure} dk)</span> <br/> 
-              <small style={{ color: '#888' }}>{w.notlar}</small>
-            </div>
-            <button onClick={() => sil(w._id)} style={{ backgroundColor: '#dc3545', width: 'auto', padding: '5px 15px', marginTop: 0 }}>Sil</button>
-          </li>
-        ))}
-      </ul>
+      {kayitlar.length > 0 && (
+        <ul style={{ listStyleType: 'none', padding: 0, marginTop: '20px' }}>
+          {kayitlar.map((kayit) => (
+            <li key={kayit._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 10px', backgroundColor: '#f8f9fa', borderLeft: '4px solid #28a745', marginBottom: '8px', borderRadius: '4px' }}>
+              <div><strong>{kayit.tip}</strong> <small>({kayit.sure} dk)</small><br/><span style={{ color: '#dc3545', fontWeight: 'bold', fontSize: '12px' }}>🔥 {kayit.kalori} kcal</span></div>
+              <button onClick={() => antrenmanSil(kayit._id)} style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}>🗑️ Sil</button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
-
 export default Workout;

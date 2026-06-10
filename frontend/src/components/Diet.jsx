@@ -1,62 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Diet = () => {
-  const [diets, setDiets] = useState([]);
   const [ogunAdi, setOgunAdi] = useState('');
   const [kalori, setKalori] = useState('');
-  
-  const kullaniciId = localStorage.getItem('kullaniciId');
-  const token = localStorage.getItem('token');
-  const config = { headers: { Authorization: `Bearer ${token}` } };
+  const [kayitlar, setKayitlar] = useState([]);
 
-  const ogunleriGetir = async () => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/diets/${kullaniciId}`, config);
-      setDiets(res.data);
-    } catch (err) { console.error(err); }
-  };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch('http://localhost:5000/api/data/diyet', { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(res => res.json())
+      .then(data => setKayitlar(data))
+      .catch(err => console.log(err));
+  }, []);
 
-  useEffect(() => { ogunleriGetir(); }, []);
-
-  const ekle = async (e) => {
+  const ogunEkle = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:5000/api/diets', { kullaniciId, ogunAdi, kalori }, config);
+      const res = await fetch('http://localhost:5000/api/data/diyet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ ad: ogunAdi, kalori: parseInt(kalori) })
+      });
+      const eklenenData = await res.json();
+      setKayitlar([eklenenData, ...kayitlar]);
       setOgunAdi(''); setKalori('');
-      ogunleriGetir();
-    } catch (err) { alert('Öğün eklenirken hata olustu!'); }
+      toast.success('🥗 Öğün başarıyla eklendi!', { theme: "colored" });
+    } catch (error) { toast.error('Hata oluştu!'); }
   };
 
-  const sil = async (id) => {
+  const diyetSil = async (id) => {
+    if (!window.confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
+    const token = localStorage.getItem('token');
     try {
-      await axios.delete(`http://localhost:5000/api/diets/${id}`, config);
-      ogunleriGetir();
-    } catch (err) { alert('Silme isleminde hata!'); }
+      await fetch(`http://localhost:5000/api/data/diyet/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      setKayitlar(kayitlar.filter(kayit => kayit._id !== id));
+      toast.error('🗑️ Öğün silindi!', { theme: "colored" });
+    } catch (error) { console.error(error); }
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', flex: 1, margin: '10px', minWidth: '300px' }}>
-      <h3>🥗 Günlük Kalori ve Beslenme</h3>
-      <form onSubmit={ekle} style={{ marginTop: '15px' }}>
-        <input placeholder="Öğün Adı (Örn: Yulaf Ezmesi)" required value={ogunAdi} onChange={(e) => setOgunAdi(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-        <input placeholder="Alınan Kalori (kcal)" type="number" required value={kalori} onChange={(e) => setKalori(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-        <button type="submit" style={{ backgroundColor: '#ffc107', color: '#333', fontWeight: 'bold' }}>Öğünü Ekle</button>
+    <div style={{ flex: '1', minWidth: '320px', backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+      <h3 style={{ color: '#212529', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '15px' }}>🥗 Günlük Kalori ve Beslenme</h3>
+      <form onSubmit={ogunEkle}>
+        <input type="text" placeholder="Öğün Adı" value={ogunAdi} onChange={(e) => setOgunAdi(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '5px', marginBottom: '10px' }} />
+        <input type="number" placeholder="Alınan Kalori (kcal)" value={kalori} onChange={(e) => setKalori(e.target.value)} required style={{ width: '100%', padding: '10px', borderRadius: '5px', marginBottom: '15px' }} />
+        <button type="submit" style={{ width: '100%', padding: '12px', backgroundColor: '#ffc107', color: '#212529', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>Öğünü Ekle</button>
       </form>
-      
-      <ul style={{ listStyle: 'none', padding: 0, marginTop: '20px' }}>
-        {diets.map(d => (
-          <li key={d._id} style={{ borderBottom: '1px solid #eee', padding: '15px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <strong style={{ color: '#333' }}>{d.ogunAdi}</strong> <br/> 
-              <small style={{ color: '#888', fontWeight: 'bold' }}>{d.kalori} kcal</small>
-            </div>
-            <button onClick={() => sil(d._id)} style={{ backgroundColor: '#dc3545', width: 'auto', padding: '5px 15px', marginTop: 0 }}>Sil</button>
-          </li>
-        ))}
-      </ul>
+      {kayitlar.length > 0 && (
+        <ul style={{ listStyleType: 'none', padding: 0, marginTop: '20px' }}>
+          {kayitlar.map((kayit) => (
+            <li key={kayit._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 10px', backgroundColor: '#f8f9fa', borderLeft: '4px solid #ffc107', marginBottom: '8px', borderRadius: '4px' }}>
+              <span style={{ fontWeight: 'bold' }}>{kayit.ad}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ color: '#28a745', fontWeight: 'bold', fontSize: '14px' }}>+ {kayit.kalori} kcal</span>
+                <button onClick={() => diyetSil(kayit._id)} style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}>🗑️ Sil</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
-
 export default Diet;

@@ -94,7 +94,7 @@ router.get('/', auth, async (req, res) => {
   } catch (err) { res.status(500).send('Hata'); }
 });
 
-// PUT İŞLEMİ (Mevcut ölçümleri güncelleme - HOCANIN ARADIĞI 4. İŞLEM!)
+// PUT İŞLEMİ (Mevcut ölçümleri güncelleme - )
 router.put('/olcum', auth, async (req, res) => {
   try {
     let data = await UserData.findOne({ kullaniciId: req.kullaniciId });

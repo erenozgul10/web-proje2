@@ -10,7 +10,8 @@ const Register = () => {
   const kayitOl = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:5000/api/auth/register', {
+      // İŞTE SON ALTIN VURUŞ BURASI! (CANLI LİNK)
+      const res = await fetch('https://web-proje2.onrender.com/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ad, email, sifre })

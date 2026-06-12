@@ -8,7 +8,8 @@ const Measurements = () => {
   // SAYFA AÇILINCA VERİLERİ ÇEK (GET)
   useEffect(() => {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:5000/api/data', {
+    // 1. DEĞİŞEN YER BURA
+    fetch('https://web-proje2.onrender.com/api/data', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
@@ -26,7 +27,8 @@ const Measurements = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch('http://localhost:5000/api/data/olcum', {
+      // 2. DEĞİŞEN YER BURA
+      const res = await fetch('https://web-proje2.onrender.com/api/data/olcum', {
         method: 'PUT', 
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(olcumler)

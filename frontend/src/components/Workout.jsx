@@ -15,7 +15,8 @@ const Workout = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:5000/api/data/antrenman', { headers: { 'Authorization': `Bearer ${token}` } })
+    // 1. DEĞİŞEN YER (GET)
+    fetch('https://web-proje2.onrender.com/api/data/antrenman', { headers: { 'Authorization': `Bearer ${token}` } })
       .then(res => res.json())
       .then(data => setKayitlar(data))
       .catch(err => console.log(err));
@@ -28,7 +29,8 @@ const Workout = () => {
     const yakilanKalori = sure ? (sure * aktifEgzersiz.carpan) : 0;
     
     try {
-      const res = await fetch('http://localhost:5000/api/data/antrenman', {
+      // 2. DEĞİŞEN YER (POST)
+      const res = await fetch('https://web-proje2.onrender.com/api/data/antrenman', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ tip: egzersiz, sure, kalori: yakilanKalori, notlar })
@@ -44,7 +46,8 @@ const Workout = () => {
     if (!window.confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
     const token = localStorage.getItem('token');
     try {
-      await fetch(`http://localhost:5000/api/data/antrenman/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      // 3. DEĞİŞEN YER (DELETE)
+      await fetch(`https://web-proje2.onrender.com/api/data/antrenman/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
       setKayitlar(kayitlar.filter(kayit => kayit._id !== id));
       toast.error('🗑️ Antrenman silindi!', { theme: "colored" });
     } catch (error) { console.error(error); }

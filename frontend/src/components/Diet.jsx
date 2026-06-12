@@ -8,7 +8,8 @@ const Diet = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    fetch('http://localhost:5000/api/data/diyet', { headers: { 'Authorization': `Bearer ${token}` } })
+    // 1. DEĞİŞEN YER BURA (GET İSTEĞİ)
+    fetch('https://web-proje2.onrender.com/api/data/diyet', { headers: { 'Authorization': `Bearer ${token}` } })
       .then(res => res.json())
       .then(data => setKayitlar(data))
       .catch(err => console.log(err));
@@ -18,7 +19,8 @@ const Diet = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5000/api/data/diyet', {
+      // 2. DEĞİŞEN YER BURA (POST İSTEĞİ)
+      const res = await fetch('https://web-proje2.onrender.com/api/data/diyet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ad: ogunAdi, kalori: parseInt(kalori) })
@@ -34,7 +36,8 @@ const Diet = () => {
     if (!window.confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
     const token = localStorage.getItem('token');
     try {
-      await fetch(`http://localhost:5000/api/data/diyet/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+      // 3. DEĞİŞEN YER BURA (DELETE İSTEĞİ)
+      await fetch(`https://web-proje2.onrender.com/api/data/diyet/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
       setKayitlar(kayitlar.filter(kayit => kayit._id !== id));
       toast.error('🗑️ Öğün silindi!', { theme: "colored" });
     } catch (error) { console.error(error); }
